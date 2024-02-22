@@ -4,33 +4,36 @@ import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { error } from 'console';
 import { response } from 'express';
+import { NavComponent } from "./nav/nav.component";
+import { FormsModule } from '@angular/forms';
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+import { User } from './_models/user';
+import { AccountService } from './_services/account.service';
+import { HomeComponent } from './home/home.component';
+
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [RouterOutlet, CommonModule],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+    selector: 'app-root',
+    standalone: true,
+    templateUrl: './app.component.html',
+    styleUrl: './app.component.css',
+    imports: [RouterOutlet, CommonModule, NavComponent, FormsModule, BsDropdownModule, HomeComponent]
 })
 export class AppComponent implements OnInit {
   title = 'The Dating App';
 
   users: any;
 
-  constructor(private http: HttpClient) {}
+  constructor(private accountService: AccountService) {}
   
   ngOnInit(): void {
-    this.http.get('https://localhost:7000/api/users').subscribe({
-      next: response => this.users = response,
-      error: error => console.log(error),
-      complete: () => console.log('Requst has completed')
-    })
+    this.setCurrentUser();
   }
-  // getUsers() {
-  //   this.http.get('http://localhost:7000/api/users').subscribe(response => {
-  //     this.users = response;
-  //   }, error => {
-  //     console.log(error);
-  //   })
-  // }
+
+
+  setCurrentUser() {
+    const user: User = JSON.parse(localStorage.getItem('user')!);
+    this.accountService.setCurrentUser(user);
+  }
+
 }
