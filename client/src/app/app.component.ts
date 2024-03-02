@@ -10,14 +10,15 @@ import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { User } from './_models/user';
 import { AccountService } from './_services/account.service';
 import { HomeComponent } from './home/home.component';
-
+import { ToastrModule } from 'ngx-toastr';
+import { SharedModule } from './_modules/shared.module';
 
 @Component({
     selector: 'app-root',
     standalone: true,
     templateUrl: './app.component.html',
     styleUrl: './app.component.css',
-    imports: [RouterOutlet, CommonModule, NavComponent, FormsModule, BsDropdownModule, HomeComponent]
+    imports: [RouterOutlet, NavComponent, FormsModule, HomeComponent, SharedModule]
 })
 export class AppComponent implements OnInit {
   title = 'The Dating App';
@@ -32,7 +33,9 @@ export class AppComponent implements OnInit {
 
 
   setCurrentUser() {
-    const user: User = JSON.parse(localStorage.getItem('user')!);
+    const userString = localStorage.getItem('user');
+    if (!userString) return;
+    const user: User = JSON.parse(userString);
     this.accountService.setCurrentUser(user);
   }
 
