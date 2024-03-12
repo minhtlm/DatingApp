@@ -56,9 +56,18 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
+using var scope = app.Services.CreateScope();
+var services = scope.ServiceProvider;
+try
 {
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    var context = services.GetRequiredService<DataContext>();
+    await context.Database.MigrateAsync();
+    await Seed.SeedUsers(context);
 }
+catch (Exception ex)
+{
+    var logger = services.GetRequiredService<ILogger<Program>>();
+    logger.LogError(ex, "An error occurred during Migration");
+}
+
+await app.RunAsync();
