@@ -10,12 +10,13 @@ import { provideAnimations } from '@angular/platform-browser/animations';
 import { errorInterceptor } from './_interceptors/error.interceptor';
 import { jwtInterceptor } from './_interceptors/jwt.interceptor';
 import { TabsModule } from 'ngx-bootstrap/tabs';
+import { loadingInterceptor } from './_interceptors/loading.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [provideRouter(routes), 
     provideClientHydration(), 
     provideAnimations(),
-    provideHttpClient(withFetch(),withInterceptors([errorInterceptor]), withInterceptors([jwtInterceptor])),
+    provideHttpClient(withFetch(),withInterceptors([errorInterceptor]), withInterceptors([jwtInterceptor]), withInterceptors([loadingInterceptor])),
     importProvidersFrom(BsDropdownModule.forRoot()), 
     importProvidersFrom(ToastrModule.forRoot({positionClass: 'toast-bottom-right'})),]
 };
