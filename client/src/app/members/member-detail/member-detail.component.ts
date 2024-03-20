@@ -4,52 +4,37 @@ import { MembersService } from '../../_services/members.service';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { TabsModule } from 'ngx-bootstrap/tabs';
-import { NgxGalleryAnimation, NgxGalleryImage, NgxGalleryModule, NgxGalleryOptions } from '@kolkov/ngx-gallery';
+import { GalleryItem, GalleryModule, ImageItem } from 'ng-gallery';
+// import { NgxGalleryAnimation, NgxGalleryImage, NgxGalleryModule, NgxGalleryOptions } from '@kolkov/ngx-gallery';
 
 @Component({
   selector: 'app-member-detail',
   standalone: true,
-  imports: [CommonModule, TabsModule, NgxGalleryModule],
+  imports: [CommonModule, TabsModule, GalleryModule],
   templateUrl: './member-detail.component.html',
   styleUrl: './member-detail.component.css'
 })
 export class MemberDetailComponent implements OnInit {
   member!: Member;
-  galleryOptions: NgxGalleryOptions[] = [];
-  galleryImages: NgxGalleryImage[] = [];
+  images: GalleryItem[] = [];
 
   constructor(private memberService: MembersService, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
     this.loadMember();
-
-    this.galleryOptions = [{
-      width: '500px',
-      height: '500px',
-      imagePercent: 100,
-      thumbnailsColumns: 4,
-      imageAnimation: NgxGalleryAnimation.Slide,
-      preview: false
-    }]
+    this.getImages();
   }
-  
-  getImages(): NgxGalleryImage[] {
-    const imageUrls = [];
-    for (const photo of this.member.photos) {
-      imageUrls.push({
-        small: photo?.url,
-        medium: photo?.url,
-        big: photo?.url
-      })
-    }
 
-    return imageUrls;
+  getImages() {
+    if (!this.member) return;
+    for (const photo of this.member.photos) {
+      this.images.push(new ImageItem({ src: photo.url, thumb: photo.url }));
+    }
   }
 
   loadMember() {
     this.memberService.getMember((this.route.snapshot.paramMap.get('username')) || '').subscribe(member => {
       this.member = member;
-      this.galleryImages = this.getImages();
     });
   }
 }
