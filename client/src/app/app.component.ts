@@ -12,6 +12,8 @@ import { AccountService } from './_services/account.service';
 import { HomeComponent } from './home/home.component';
 import { ToastrModule } from 'ngx-toastr';
 import { SharedModule } from './_modules/shared.module';
+import { TimeagoIntl } from 'ngx-timeago';
+import { strings as stringsEn } from 'ngx-timeago/language-strings/en';
 
 @Component({
     selector: 'app-root',
@@ -25,7 +27,10 @@ export class AppComponent implements OnInit {
 
   users: any;
 
-  constructor(private accountService: AccountService) {}
+  constructor(private accountService: AccountService, private intl: TimeagoIntl) {
+    this.intl.strings = stringsEn;
+    this.intl.changes.next();
+  }
   
   ngOnInit(): void {
     this.setCurrentUser();

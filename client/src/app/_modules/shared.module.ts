@@ -18,7 +18,7 @@ import { NgxSpinnerModule } from 'ngx-spinner';
     TabsModule.forRoot(),
     // NgxGalleryModule,
     NgxSpinnerModule,
-    // FileUploadModule
+    // FileUploadModule,
   ],
   exports: [
     ToastrModule,
@@ -26,7 +26,7 @@ import { NgxSpinnerModule } from 'ngx-spinner';
     TabsModule,
     // NgxGalleryModule,
     NgxSpinnerModule,
-    // FileUploadModule
+    // FileUploadModule,
   ]
 })
 export class SharedModule { }
