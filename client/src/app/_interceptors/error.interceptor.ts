@@ -20,8 +20,10 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
                 }
               }
               throw modalStateErrors.flat();
+            } else if (error.error.message) {
+              toastr.error(error.error.message, error.status);
             } else {
-              toastr.error(error.statusText, error.status);
+              toastr.error(error.statusText, error.status)
             }
             break;
           case 401:
