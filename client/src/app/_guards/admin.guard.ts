@@ -2,20 +2,21 @@ import { inject } from '@angular/core';
 import { CanActivateFn } from '@angular/router';
 import { AccountService } from '../_services/account.service';
 import { ToastrService } from 'ngx-toastr';
-import { catchError, map } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { map } from 'rxjs';
 
-export const authGuard: CanActivateFn = (route, state) => {
+export const adminGuard: CanActivateFn = (route, state) => {
   const accountService = inject(AccountService);
   const toastr = inject(ToastrService);
 
   return accountService.currentUser$.pipe(
     map(user => {
-      if (user) return true;
+      if (user.roles.includes("Admin") || user.roles.includes("Moderator")) {
+        return true;
+      }
       else {
-        toastr.error('You shall not pass!');
+        toastr.error("You cannot enter this area");
         return false;
       }
-    })
+    }) 
   )
 };

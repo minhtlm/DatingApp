@@ -4,6 +4,7 @@ import { ToastrModule } from 'ngx-toastr';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { NgxSpinnerModule } from 'ngx-spinner';
+import { ModalModule } from 'ngx-bootstrap/modal';
 // import { FileUploadModule } from 'ng2-file-upload';
 // import { NgxGalleryModule } from '@kolkov/ngx-gallery';
 
@@ -19,6 +20,7 @@ import { NgxSpinnerModule } from 'ngx-spinner';
     // NgxGalleryModule,
     NgxSpinnerModule,
     // FileUploadModule,
+    ModalModule.forRoot()
   ],
   exports: [
     ToastrModule,
@@ -27,6 +29,7 @@ import { NgxSpinnerModule } from 'ngx-spinner';
     // NgxGalleryModule,
     NgxSpinnerModule,
     // FileUploadModule,
+    ModalModule
   ]
 })
 export class SharedModule { }
