@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Message } from '../_models/message';
 import { Pagination } from '../_models/pagination';
 import { MessageService } from '../_services/message.service';
@@ -18,14 +18,15 @@ import { ButtonsModule } from 'ngx-bootstrap/buttons';
   styleUrl: './messages.component.css'
 })
 export class MessagesComponent implements OnInit{
+  messageService = inject(MessageService);
+
   messages: Message[] = [];
   pagination: Pagination | undefined;
-  container = 'Unread';
+  container = 'Inbox';
   pageNumber = 1;
   pageSize = 5;
-  loading = false;
+  isOutbox = this.container === "Outbox";
 
-  constructor(private messageService: MessageService) {}
 
   ngOnInit(): void {
     this.loadMessages();
@@ -33,24 +34,33 @@ export class MessagesComponent implements OnInit{
 
 
   loadMessages() {
-    this.loading = true;
-    this.messageService.getMessages(this.pageNumber, this.pageSize, this.container).subscribe(response => {
-      this.messages = response.result || [];
-      this.pagination = response.pagination;
-      this.loading = false;
-    })
-
+    this.messageService.getMessages(this.pageNumber, this.pageSize, this.container);
   }
 
   deleteMessage(id: number) {
-    this.messageService.deleteMessage(id).subscribe(() => {
-      this.messages.splice(this.messages.findIndex(m => m.id = id), 1);
+    this.messageService.deleteMessage(id).subscribe({
+      next: _ => {
+        this.messageService.paginatedResult.update(prev => {
+          if (prev && prev.result) {
+            prev.result.slice(prev.result.findIndex(m => m.id), 1)
+            return prev;
+          }
+          return prev;
+        })
+      }
     })
   }
 
   pageChanged(event: any) {
-    this.pageNumber = event.page;
-    this.loadMessages();
+    if (this.pageNumber !== event.page) {
+      this.pageNumber = event.page;
+      this.loadMessages();
+    }
+  }
+
+  getRoute(message: Message) {
+    if (this.container === 'Outbox') return `/members/${message.recipientUsername}`;
+    else return `/members/${message.senderUsername}`;
   }
 
 }

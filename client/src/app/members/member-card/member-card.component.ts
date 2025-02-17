@@ -1,8 +1,10 @@
-import { Component, Input} from '@angular/core';
+import { Component, computed, inject, input, Input} from '@angular/core';
 import { Member } from '../../_models/member';
 import { RouterModule } from '@angular/router';
 import { MembersService } from '../../_services/members.service';
 import { ToastrService } from 'ngx-toastr';
+import { LikesService } from '../../_services/likes.service';
+import { PresenceService } from '../../_services/presence.service';
 
 @Component({
   selector: 'app-member-card',
@@ -12,13 +14,22 @@ import { ToastrService } from 'ngx-toastr';
   styleUrl: './member-card.component.css'
 })
 export class MemberCardComponent {
-  @Input() member!: Member;
+  private likeService = inject(LikesService);
+  public presenceService = inject(PresenceService);
 
-  constructor(private memberService: MembersService, private toastr: ToastrService) {}
+  member = input.required<Member>();
+  hasLiked = computed(() => this.likeService.likeIds().includes(this.member().id));
+  isOnline = computed(() => this.presenceService.onlineUsers().includes(this.member().username));
 
-  addLike(member: Member) {
-    this.memberService.addLike(member.username).subscribe(() => {
-      this.toastr.success('You have liked' + member.knownAs);
+  toggleLike() {
+    this.likeService.toggleLike(this.member().id).subscribe({
+      next: () => {
+        if (this.hasLiked()) {
+          this.likeService.likeIds.update(ids => ids.filter(x => x !== this.member().id))
+        } else {
+          this.likeService.likeIds.update(ids => [...ids, this.member().id]);
+        }
+      }
     })
   }
 }

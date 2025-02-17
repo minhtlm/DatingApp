@@ -23,8 +23,8 @@
             </div>
             <div class="card-footer">
                 <div class="btn-group d-flex">
-                    <button class="btn btn-primary">Like</button>
-                    <button (click)="selectTab(3)" class="btn btn-success">Message</button>
+                    <!-- <button class="btn btn-primary" (click)="toggleLike()">Like</button> -->
+                    <button (click)="selectTab('Messages')" class="btn btn-success">Message</button>
                 </div>
             </div>
         </div>
@@ -45,8 +45,8 @@
             <tab heading="Photos" (selectTab)="onTabActivate($event)">
                 <gallery class="gallery" [items]="images"></gallery>
             </tab>
-            <tab heading="Message" (selectTab)="onTabActivate($event)">
-                <app-member-messages [username]="member.username" [messages]="messages" ></app-member-messages>
+            <tab heading="Messages" (selectTab)="onTabActivate($event)">
+                <app-member-messages [username]="member.username" ></app-member-messages>
             </tab>
         </tabset>
     </div>

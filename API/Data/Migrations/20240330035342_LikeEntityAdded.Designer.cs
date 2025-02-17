@@ -107,12 +107,12 @@ namespace API.Data.Migrations
                     b.Property<int>("SourceUserId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("LikedUserId")
+                    b.Property<int>("TargetUserId")
                         .HasColumnType("INTEGER");
 
-                    b.HasKey("SourceUserId", "LikedUserId");
+                    b.HasKey("SourceUserId", "TargetUserId");
 
-                    b.HasIndex("LikedUserId");
+                    b.HasIndex("TargetUserId");
 
                     b.ToTable("Likes");
                 });
@@ -130,9 +130,9 @@ namespace API.Data.Migrations
 
             modelBuilder.Entity("API.Entities.UserLike", b =>
                 {
-                    b.HasOne("API.Entities.AppUser", "LikedUser")
+                    b.HasOne("API.Entities.AppUser", "TargetUser")
                         .WithMany("LikedByUsers")
-                        .HasForeignKey("LikedUserId")
+                        .HasForeignKey("TargetUserId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
@@ -142,7 +142,7 @@ namespace API.Data.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.Navigation("LikedUser");
+                    b.Navigation("TargetUser");
 
                     b.Navigation("SourceUser");
                 });

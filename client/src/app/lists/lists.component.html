@@ -1,34 +1,41 @@
 <div class="text-center mt-3">
-    <h2>{{predicate === "liked" ? "Member I like" : "Member who like me"}}</h2>
+    <h2>{{getTitle()}}</h2>
 </div>
 
 <div class="container mt-3">
     <div class="d-flex">
-        <div class="btn-group" name="predicate">
+        <div class="btn-group">
             <button class="btn btn-primary" (click)="loadLikes()" btnRadio="liked" 
                 [(ngModel)]="predicate">Members I like</button>
             <button class="btn btn-primary" (click)="loadLikes()" btnRadio="likedBy" 
                 [(ngModel)]="predicate">Members who like me</button>
+            <button class="btn btn-primary" (click)="loadLikes()" btnRadio="mutual" 
+                [(ngModel)]="predicate">Mutual</button>
         </div>
     </div>
 
     <div class="row mt-3">
-        <div class="col-2" *ngFor="let member of members">
-            <app-member-card [member]="member"></app-member-card>
-        </div>
+        @for (member of likesService.paginatedResult()?.result; track member.id) {
+            <div class="col-2">
+                <app-member-card [member]="member"></app-member-card>
+            </div>
+        }
     </div>
 </div>
 
-<div class="d-flex justify-content-center" *ngIf="pagination">
-    <pagination
-        [boundaryLinks]="true"    
-        [totalItems]="pagination.totalItems"
-        [itemsPerPage]="pagination.itemsPerPage"
-        [(ngModel)]="pagination.currentPage"
-        (pageChanged)="pageChanged($event)"
-        previousText="&lsaquo;"
-        nextText="&rsaquo;"
-        firstText="&lsaquo;"
-        lastText="&rsaquo;">
-    </pagination>
-</div>
+@if (likesService.paginatedResult()?.pagination) {
+    <div class="d-flex justify-content-center">
+        <pagination
+            [boundaryLinks]="true"    
+            [totalItems]="likesService.paginatedResult()?.pagination!.totalItems"
+            [itemsPerPage]="likesService.paginatedResult()?.pagination!.itemsPerPage"
+            [(ngModel)]="likesService.paginatedResult()?.pagination!.currentPage"
+            (pageChanged)="pageChanged($event)"
+            [maxSize]="10"
+            previousText="&lsaquo;"
+            nextText="&rsaquo;"
+            firstText="&lsaquo;"
+            lastText="&rsaquo;">
+        </pagination>
+    </div>
+}

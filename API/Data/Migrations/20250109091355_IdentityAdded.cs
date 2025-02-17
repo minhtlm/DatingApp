@@ -12,7 +12,7 @@ namespace API.Data.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_Likes_Users_LikedUserId",
+                name: "FK_Likes_Users_TargetUserId",
                 table: "Likes");
 
             migrationBuilder.DropForeignKey(
@@ -304,9 +304,9 @@ namespace API.Data.Migrations
                 column: "RoleId");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Likes_AspNetUsers_LikedUserId",
+                name: "FK_Likes_AspNetUsers_TargetUserId",
                 table: "Likes",
-                column: "LikedUserId",
+                column: "TargetUserId",
                 principalTable: "AspNetUsers",
                 principalColumn: "Id");
 
@@ -346,7 +346,7 @@ namespace API.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_Likes_AspNetUsers_LikedUserId",
+                name: "FK_Likes_AspNetUsers_TargetUserId",
                 table: "Likes");
 
             migrationBuilder.DropForeignKey(
@@ -481,9 +481,9 @@ namespace API.Data.Migrations
                 column: "Id");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Likes_Users_LikedUserId",
+                name: "FK_Likes_Users_TargetUserId",
                 table: "Likes",
-                column: "LikedUserId",
+                column: "TargetUserId",
                 principalTable: "Users",
                 principalColumn: "Id");
 

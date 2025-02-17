@@ -13,52 +13,43 @@ using Microsoft.AspNetCore.Mvc;
 namespace API.Controllers
 {
     [Authorize]
-    public class LikesController : BaseApiController
+    public class LikesController(ILikesRepository likesRepository) : BaseApiController
     {
-        private readonly IUserRepository _userRepository;
-        private readonly ILikesRepository _likesRepository;
-        public LikesController(IUserRepository userRepository, ILikesRepository likesRepository)
-        {
-            _likesRepository = likesRepository;
-            _userRepository = userRepository;
-        }
-        
-        [HttpPost("{username}")]
-        public async Task<ActionResult> AddLike(string username)
+        [HttpPost("{targetUserId:int}")]
+        public async Task<ActionResult> ToggleLike(int targetUserId)
         {
             var sourceUserId = User.GetUserId();
-            var likedUser = await _userRepository.GetUserByUsernameAsync(username);
-            var sourceUser = await _likesRepository.GetUserWithLikes(sourceUserId);
+            if (sourceUserId == targetUserId) return BadRequest("You cannot like yourself");
+            
+            var existingLike = await likesRepository.GetUserLike(sourceUserId, targetUserId);
+            if (existingLike == null) {
+                var like = new UserLike {
+                    SourceUserId = sourceUserId,
+                    TargetUserId = targetUserId
+                };
+                likesRepository.AddLike(like);
+            } else {
+                likesRepository.DeleteLike(existingLike);
+            }
 
-            if (likedUser == null) return NotFound();
+            if (await likesRepository.SaveChanges()) return Ok();
 
-            if (sourceUser.UserName == username) return BadRequest(new {message = "You can't like yourself"});
-
-            var userLike = await _likesRepository.GetUserLike(sourceUserId, likedUser.Id);
-
-            if (userLike != null) return BadRequest(new {message = "You already like this user"});
-
-            userLike = new UserLike
-            {
-                SourceUserId = sourceUserId,
-                LikedUserId = likedUser.Id
-            };
-
-            sourceUser.LikedUsers.Add(userLike);
-
-            if (await _userRepository.SaveAllAsync()) return Ok();
-
-            return BadRequest(new {message = "Failed to like user"});
+            return BadRequest("Failed to like user");
         }
 
+        [HttpGet("list")]
+        public async Task<ActionResult<IEnumerable<int>>> GetCurrentUserLikeIds()
+        {
+            return Ok(await likesRepository.GetCurrentUserLikeIds(User.GetUserId()));
+        }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<LikeDto>>> GetUserLikes([FromQuery] LikesParams likesParams)
+        public async Task<ActionResult<IEnumerable<MemberDto>>> GetUserLikes([FromQuery] LikesParams likesParams)
         {
             likesParams.UserId = User.GetUserId();
-            var users = await _likesRepository.GetUserLikes(likesParams);
+            var users = await likesRepository.GetUserLikes(likesParams);
 
-            Response.AddPaginationHeader(users.CurrentPage, users.PageSize, users.TotalCount, users.TotalPages);
+            Response.AddPaginationHeader(users);
             
             return Ok(users);
         }

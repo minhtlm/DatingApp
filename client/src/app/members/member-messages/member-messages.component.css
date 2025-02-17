@@ -17,3 +17,11 @@
 .rounded-circle {
     max-height: 50px;
 }
+
+.text-muted {
+    font-size: 0.575em;
+}
+
+.text-success .text-danger {
+    margin-left: 5px;
+}

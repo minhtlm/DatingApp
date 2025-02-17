@@ -20,6 +20,8 @@ namespace API.Data
         public DbSet<UserLike> Likes { get; set; }
 
         public DbSet<Message> Messages { get; set; }
+        public DbSet<Group> Groups { get; set; }
+        public DbSet<Connection> Connections { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -38,7 +40,7 @@ namespace API.Data
                 .IsRequired();
 
             builder.Entity<UserLike>()
-                .HasKey(k => new {k.SourceUserId, k.LikedUserId});
+                .HasKey(k => new {k.SourceUserId, k.TargetUserId});
 
             builder.Entity<UserLike>()
                 .HasOne(s => s.SourceUser)
@@ -47,9 +49,9 @@ namespace API.Data
                 .OnDelete(DeleteBehavior.NoAction);
 
             builder.Entity<UserLike>()
-                .HasOne(s => s.LikedUser)
+                .HasOne(s => s.TargetUser)
                 .WithMany(l => l.LikedByUsers)
-                .HasForeignKey(s => s.LikedUserId)
+                .HasForeignKey(s => s.TargetUserId)
                 .OnDelete(DeleteBehavior.NoAction);
 
             builder.Entity<Message>()

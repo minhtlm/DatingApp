@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Member } from '../../_models/member';
 import { MembersService } from '../../_services/members.service';
 import { CommonModule } from '@angular/common';
@@ -20,36 +20,31 @@ import { ButtonsModule } from 'ngx-bootstrap/buttons';
   styleUrl: './member-list.component.css'
 })
 export class MemberListComponent implements OnInit{
-  members: Member[] = [];
-  pagination: Pagination | undefined;
-  userParams: UserParams;
-  user: User | undefined;
+  memberService = inject(MembersService);
+  accountService = inject(AccountService);
+
   genderList = [{value: 'male', display: 'Males'}, {value: 'female', display: 'Females'}];
 
-  constructor(private memberService: MembersService, private accountService: AccountService) {
-    this.userParams = this.memberService.getUserParams();
-  }
 
   ngOnInit(): void {
-    this.loadMembers();
+    if (!this.memberService.paginatedResult()) {
+      this.loadMembers();
+    }
   }
 
   loadMembers() {
-    this.memberService.setUserParams(this.userParams);
-    this.memberService.getMembers(this.userParams as any).subscribe(response => {
-      this.members = response.result as any;
-      this.pagination = response.pagination;
-    })
+    this.memberService.getMembers();
   }
 
   resetFilters() {
-    this.userParams = this.memberService.resetUserParams();
+    this.memberService.resetUserParams();
     this.loadMembers();
   }
 
   pageChanged(event: any) {
-    this.userParams!.pageNumber = event.page;
-    this.memberService.setUserParams(this.userParams);
-    this.loadMembers();
+    if (this.memberService.userParams().pageNumber != event.page) {
+      this.memberService.userParams().pageNumber = event.page;
+      this.loadMembers();
+    }
   }
 }

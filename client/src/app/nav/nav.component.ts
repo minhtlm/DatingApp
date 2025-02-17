@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AccountService } from '../_services/account.service';
 import { response } from 'express';
@@ -19,23 +19,23 @@ import { HasRoleDirective } from '../_directives/has-role.directive';
   styleUrl: './nav.component.css'
 })
 export class NavComponent {
-  model: any={}
+  accountService = inject(AccountService);
+  private router = inject(Router);
+  private toastr = inject(ToastrService);
+  model: any = {};
 
-  constructor(public accountService: AccountService, private router: Router, private toastr: ToastrService) {}
-
-  ngOnInit(): void {
-    
-  }
+  // constructor() {
+  //   effect(() => {
+  //     console.log("Current user in nav: ", this.accountService.currentUser());
+  //   })
+  // }
 
   login() {
     this.accountService.login(this.model).subscribe({
-      next: response => {
-        this.router.navigateByUrl('/members');
+      next: _ => {
+        this.router.navigateByUrl('/members')
       },
-        error: error => {
-          console.log(error);
-          this.toastr.error(error.error)
-        }
+        error: error => this.toastr.error(error.error)
     })
   }
 

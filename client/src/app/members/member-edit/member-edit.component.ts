@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
+import { Component, HostListener, inject, OnInit, ViewChild } from '@angular/core';
 import { Member } from '../../_models/member';
 import { User } from '../../_models/user';
 import { AccountService } from '../../_services/account.service';
@@ -19,32 +19,41 @@ import { TimeagoModule } from 'ngx-timeago';
   styleUrl: './member-edit.component.css'
 })
 export class MemberEditComponent implements OnInit {
-  @ViewChild("editForm") editForm!: NgForm;
-  member!: Member;
-  user!: User;
-  @HostListener('window:beforeunload', ['$event']) unloadNotification($event: any) {
-    if (this.editForm.dirty) {
+  @ViewChild("editForm") editForm?: NgForm;
+  @HostListener('window:beforeunload', ['$event']) notify($event: any) {
+    if (this.editForm?.dirty) {
       $event.returnValue = true;
     }
   }
 
-  constructor(private accountService: AccountService, private memberService: MembersService, private toastr: ToastrService) {
-    this.accountService.currentUser$.pipe(take(1)).subscribe(user => this.user = user);
-  }
+  member?: Member;
+  private accountService = inject(AccountService);
+  private memberService = inject(MembersService);
+  private toastr = inject(ToastrService);
+
+
   ngOnInit(): void {
     this.loadMember();
   }
 
   loadMember() {
-    this.memberService.getMember(this.user.username).subscribe(member => {
-      this.member = member;
+    const user = this.accountService.currentUser();
+    if (!user) return;
+    this.memberService.getMember(user.username).subscribe({
+      next: member => this.member = member
     })
   }
 
   updateMember() {
-    this.memberService.updateMember(this.member).subscribe(() => {
-      this.toastr.success('Profile updated successfully!');
-      this.editForm.reset(this.member);
+    this.memberService.updateMember(this.editForm?.value).subscribe({
+      next: _ => {
+        this.toastr.success('Profile updated successfully!');
+        this.editForm?.reset(this.member);
+      }
     })
+  }
+
+  onMemberChange(event: Member) {
+    this.member = event;
   }
 }

@@ -3,7 +3,7 @@ import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { PaginatedResult } from '../_models/pagination';
 import { Member } from '../_models/member';
-import { getPaginationHeaders, setPaginatedResponse } from './paginationHelper';
+import { getPaginationHeaders, getPaginatedResponse } from './paginationHelper';
 
 @Injectable({
   providedIn: 'root'
@@ -25,7 +25,7 @@ export class LikesService {
 
     return this.http.get<Member[]>(`${this.baseUrl}likes`,
       {observe: 'response', params}).subscribe({
-        next: response => setPaginatedResponse(response, this.paginatedResult)
+        next: response => getPaginatedResponse(response, this.paginatedResult)
       })
   }
 
